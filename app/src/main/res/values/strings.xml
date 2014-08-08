@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ZBT Rush GPS</string>
+
+    <string name="activity_main_text1">Your location is being monitored by the ZBT Xi Chapter Department of Rush Activities.\n\nHave a nice day!</string>
+    <string name="activity_main_text2">Have a nice day!</string>
+
+    <string name="button_stop">Stop</string>
+
+    <string name="notification_content">Tracking location</string>
+    <string name="prompt_gps">GPS is currently disabled. Hit OK to change your settings.</string>
+
+</resources>
