@@ -4,54 +4,46 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-public class GpsService extends Service {
+public class GpsService extends Service
+        implements LocationListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
     private static final String TAG = "GpsService";
+
+    public static final String LOCATION_INTENT_FILTER = "locationChanged";
 
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
-    private LocationManager locationManager = null;
-    private LocationListener locationListener = new LocationListener();
+    private LocationManager mLocationManager = null;
+    private Location mLastLocation = null;
 
-    private NotificationManager notificationManager = null;
+    private NotificationManager mNotificationManager = null;
 
-    boolean alreadyRunning = false;
+    private boolean mAlreadyRunning = false;
 
-    private class LocationListener implements android.location.LocationListener {
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.e(TAG, "onLocationChanged: " + location);
-            RestClient.postGps(location.getLatitude(), location.getLongitude());
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            Log.e(TAG, "onProviderDisabled: " + provider);
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            Log.e(TAG, "onProviderEnabled: " + provider);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.e(TAG, "onStatusChanged: " + provider);
+    public class GpsServiceBinder extends Binder {
+        public Location getLocation() {
+            return GpsService.this.mLastLocation;
         }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return new GpsServiceBinder();
     }
 
     @Override
@@ -59,29 +51,26 @@ public class GpsService extends Service {
         Log.i(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
-        if (alreadyRunning) {
+        if (mAlreadyRunning) {
             Log.i(TAG, "already running!");
             return START_STICKY;
         }
 
-        if (locationManager == null) {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        }
+        updateHttpEndpoint();
 
-        if (notificationManager == null) {
-            notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        }
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         Criteria locationProviderCriteria = new Criteria();
         locationProviderCriteria.setAccuracy(Criteria.ACCURACY_FINE);
 
-        locationManager.requestLocationUpdates(
+        mLocationManager.requestLocationUpdates(
                 LOCATION_INTERVAL, LOCATION_DISTANCE,
-                locationProviderCriteria, locationListener, null);
+                locationProviderCriteria, this, null);
 
         createOngoingNotification();
 
-        alreadyRunning = true;
+        mAlreadyRunning = true;
 
         return START_STICKY;
     }
@@ -91,13 +80,55 @@ public class GpsService extends Service {
         Log.i(TAG, "onDestroy");
         super.onDestroy();
 
-        if (locationManager != null) {
-            locationManager.removeUpdates(locationListener);
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(this);
         }
 
-        if (notificationManager != null) {
-            notificationManager.cancelAll();
+        if (mNotificationManager != null) {
+            mNotificationManager.cancelAll();
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.e(TAG, "onLocationChanged: " + location);
+        mLastLocation = location;
+
+        // Send the location update to the HTTP endpoint.
+        RestClient.postGps(location);
+
+        // Broadcast the location update to other classes in this app (e.g. DevDebugDataFragment).
+        Intent broadcast = new Intent(LOCATION_INTENT_FILTER);
+        broadcast.putExtra("location", location);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.e(TAG, "onProviderDisabled: " + provider);
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.e(TAG, "onProviderEnabled: " + provider);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.e(TAG, "onStatusChanged: " + provider);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("pref_endpoint")) {
+            updateHttpEndpoint();
+        }
+    }
+
+    private void updateHttpEndpoint() {
+        String url = PreferenceManager.getDefaultSharedPreferences(this)
+                                      .getString("pref_endpoint", "");
+        RestClient.setBaseUrl(url);
     }
 
     private void createOngoingNotification() {
@@ -123,7 +154,7 @@ public class GpsService extends Service {
         builder.setContentIntent(stackBuilder.getPendingIntent(
                 0, PendingIntent.FLAG_UPDATE_CURRENT));
 
-        notificationManager.notify(0, builder.build());
+        mNotificationManager.notify(0, builder.build());
     }
 
 }

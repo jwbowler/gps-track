@@ -1,23 +1,53 @@
 package edu.mit.zbt.rushgps.app;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ViewConfiguration;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+
+import java.lang.reflect.Field;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
+
+    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mWebView = (WebView) findViewById(R.id.webview);
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.setWebViewClient(new WebViewClient());
+
+        mWebView.loadUrl("http://www.google.com");
+
+        // Old devices have a dedicated "menu" button that users always forget exists. For menu
+        // items that don't get icons in the top bar, new devices will put a menu-looking button on
+        // screen. This hack forces this behavior on all devices.
+        //
+        // http://stackoverflow.com/questions/20444596/how-to-force-action-bar-overflow-icon-to-show
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception e) {
+            // idk
+        }
     }
 
     protected void onStart() {
@@ -32,24 +62,30 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
-    // Assigned to the button in activity_main.xml
-    public void onStopButtonClick(View v) {
+    public void onChangeCarClick(MenuItem item) {
+
+    }
+
+    public void onDevConsoleClick(MenuItem item) {
+        startActivity(new Intent(this, DevConsoleActivity.class));
+    }
+
+    public void onStopClick(MenuItem item) {
         stopGpsService();
         finish();
     }
 
     private void startGpsService() {
-        Intent serviceIntent = new Intent(this, GpsService.class);
-        startService(serviceIntent);
+        startService(new Intent(this, GpsService.class));
     }
 
     private void stopGpsService() {
-        Intent serviceIntent = new Intent(this, GpsService.class);
-        stopService(serviceIntent);
+        stopService(new Intent(this, GpsService.class));
     }
 
     private void displayPromptForEnablingGPS() {

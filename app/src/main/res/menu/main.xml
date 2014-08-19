@@ -1,10 +1,14 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="edu.mit.zbt.rushgps.app.MainActivity" >
-    
-    <!--<item android:id="@+id/action_settings"-->
-        <!--android:title="@string/action_settings"-->
-        <!--android:orderInCategory="100"-->
-        <!--app:showAsAction="never" />-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_change_car"
+          android:title="@string/action_change_car"
+          android:onClick="onChangeCarClick"
+          android:showAsAction="never" />
+    <item android:id="@+id/action_dev_settings"
+          android:title="@string/action_dev_settings"
+          android:onClick="onDevConsoleClick"
+          android:showAsAction="never" />
+    <item android:id="@+id/action_stop"
+          android:title="@string/action_stop"
+          android:onClick="onStopClick"
+          android:showAsAction="never" />
 </menu>

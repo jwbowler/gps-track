@@ -2,13 +2,17 @@
 <resources>
 
     <string name="app_name">ZBT Rush GPS</string>
+    <string name="title_activity_dev_console">Dev console</string>
 
-    <string name="activity_main_text1">Your location is being monitored by the ZBT Xi Chapter Department of Rush Activities.\n\nHave a nice day!</string>
-    <string name="activity_main_text2">Have a nice day!</string>
+    <string name="action_change_car">Switch car</string>
+    <string name="action_dev_settings">Dev console</string>
+    <string name="action_stop">Stop tracking and quit</string>
 
-    <string name="button_stop">Stop</string>
+    <string name="pref_change_endpoint">Edit HTTP endpoint</string>
+    <string name="endpoint_default">https://zbt-rush-test.meteor.com</string>
 
     <string name="notification_content">Tracking location</string>
+
     <string name="prompt_gps">GPS is currently disabled. Hit OK to change your settings.</string>
 
 </resources>
