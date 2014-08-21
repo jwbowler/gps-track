@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
                 menuKeyField.setBoolean(config, false);
             }
         } catch (Exception e) {
-            // idk
+            // #yolo
         }
     }
 
@@ -68,7 +68,10 @@ public class MainActivity extends Activity {
     }
 
     public void onChangeCarClick(MenuItem item) {
+        //DialogFragment carListDialogFragment = new CarListDialogFragment();
+        //carListDialogFragment.show(getFragmentManager(), null);
 
+        startActivity(new Intent(this, CarListActivity.class));
     }
 
     public void onDevConsoleClick(MenuItem item) {

@@ -56,7 +56,7 @@ public class GpsService extends Service
             return START_STICKY;
         }
 
-        updateHttpEndpoint();
+        updateBaseUrl();
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -120,15 +120,17 @@ public class GpsService extends Service
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("pref_endpoint")) {
-            updateHttpEndpoint();
+        if (key.equals("pref_base")) {
+            updateBaseUrl();
         }
     }
 
-    private void updateHttpEndpoint() {
+    private void updateBaseUrl() {
         String url = PreferenceManager.getDefaultSharedPreferences(this)
-                                      .getString("pref_endpoint", "");
-        RestClient.setBaseUrl(url);
+                                      .getString("pref_base", "");
+        Log.d(TAG, "url = " + url);
+        //RestClient.setBaseUrl(url);
+        RestClient.setBaseUrl("https://zbt-rush-test.meteor.com");
     }
 
     private void createOngoingNotification() {

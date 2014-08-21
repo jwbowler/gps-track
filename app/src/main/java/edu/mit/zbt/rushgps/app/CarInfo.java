@@ -18,4 +18,9 @@ public class CarInfo {
         return description;
     }
 
+    @Override
+    public String toString() {
+        return description;
+    }
+
 }

@@ -3,10 +3,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:key="pref_endpoint"
-        android:title="@string/pref_change_endpoint"
-        android:dialogTitle="@string/pref_change_endpoint"
-        android:defaultValue="@string/endpoint_default"
+        android:key="pref_base"
+        android:title="@string/pref_base_url"
+        android:dialogTitle="@string/pref_base_url"
+        android:defaultValue="@string/base_url_default"
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 

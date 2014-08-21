@@ -1,13 +1,13 @@
 package edu.mit.zbt.rushgps.app;
 
 import android.location.Location;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.turbomanage.httpclient.AsyncCallback;
 import com.turbomanage.httpclient.HttpResponse;
 import com.turbomanage.httpclient.android.AndroidHttpClient;
 
+import org.apache.http.HttpException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,35 +50,40 @@ public class RestClient {
         });
     }
 
-    public class GetCarsAsync extends AsyncTask<Void, Void, List<CarInfo>> {
-        private final String TAG = "GetCarsAsync";
+    public static List<CarInfo> getCarsList() throws JSONException, HttpException {
+//        JSONArray cars = getCarsJson();
+//        List<CarInfo> list = new ArrayList<CarInfo>();
+//
+//        for (int i = 0; i < cars.length(); i++) {
+//            list.add(new CarInfo(
+//                    cars.getJSONObject(i).getString("_id"),
+//                    cars.getJSONObject(i).getString("description")));
+//        }
+//        return list;
 
-        @Override
-        protected List<CarInfo> doInBackground(Void... params) {
-            try {
-                return getCarsList();
-            } catch (JSONException e) {
-                Log.e(TAG, e.getMessage());
-                return null;
-            }
-        }
+        return getMockCarsList();
     }
 
-    private static List<CarInfo> getCarsList() throws JSONException {
-        JSONArray cars = getCarsJson();
-        List<CarInfo> list = new ArrayList<CarInfo>();
-
-        for (int i = 0; i < cars.length(); i++) {
-            list.add(new CarInfo(
-                    cars.getJSONObject(i).getString("_id"),
-                    cars.getJSONObject(i).getString("description")));
+    public static List<CarInfo> getMockCarsList() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // rofl
         }
+        List<CarInfo> list = new ArrayList<CarInfo>();
+        list.add(new CarInfo("123", "The van"));
+        list.add(new CarInfo("456", "Charles's car"));
+        list.add(new CarInfo("789", "Kyle's car"));
 
         return list;
     }
 
-    private static JSONArray getCarsJson() throws JSONException {
+    private static JSONArray getCarsJson() throws JSONException, HttpException {
         HttpResponse response = httpClient.get("/cars/json", null);
+        if (response == null) {
+            throw new HttpException();
+        }
+        System.out.println(response.getBodyAsString());
         return new JSONArray(response.getBodyAsString());
     }
 
