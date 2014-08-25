@@ -8,11 +8,61 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="edu.mit.zbt.rushgps.app.DevDebugDataFragment" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/view_latitude" />
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="5dp">
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Latitude   "
+                android:id="@+id/textView" />
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Unset"
+                android:id="@+id/debug_latitude"
+                android:layout_gravity="right" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="5dp">
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Longitude   "
+                android:id="@+id/textView2" />
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Unset"
+                android:id="@+id/debug_longitude"
+                android:layout_gravity="right"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:padding="5dp">
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Accuracy   "
+                android:id="@+id/textView3" />
+
+            <TextView
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Unset"
+                android:id="@+id/debug_accuracy"
+                android:layout_gravity="right"/>
+        </TableRow>
+    </TableLayout>
+
 </RelativeLayout>
 

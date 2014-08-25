@@ -19,7 +19,6 @@ public class CarListLoader extends AsyncTaskLoader<List<CarInfo>> {
 
     @Override
     public List<CarInfo> loadInBackground() {
-        Log.d(TAG, "Loading");
         List<CarInfo> list;
         try {
             list = RestClient.getCarsList();
@@ -29,13 +28,11 @@ public class CarListLoader extends AsyncTaskLoader<List<CarInfo>> {
         } catch (HttpException e) {
             list = new ArrayList<CarInfo>();
         }
-        Log.d(TAG, "Loaded");
         return list;
     }
 
     @Override
     protected void onStartLoading() {
-        Log.d(TAG, "onStartLoading");
         forceLoad();
     }
 

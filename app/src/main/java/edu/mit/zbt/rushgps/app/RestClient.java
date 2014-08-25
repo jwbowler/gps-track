@@ -19,9 +19,23 @@ public class RestClient {
     private static final String TAG = "RestClient";
 
     private static AndroidHttpClient httpClient = null;
+    private static String carListEndpoint = null;
+    private static String gpsEndpoint = null;
 
     public static void setBaseUrl(String baseUrl) {
         httpClient = new AndroidHttpClient(baseUrl);
+    }
+
+    public static void setCarListEndpoint(String newCarListEndpoint) {
+        carListEndpoint = newCarListEndpoint;
+    }
+
+    public static void setGpsEndpoint(String newGpsEndpoint) {
+        gpsEndpoint = newGpsEndpoint;
+    }
+
+    public static boolean isGpsEndpointSet() {
+        return gpsEndpoint != null && gpsEndpoint != "";
     }
 
     public static void postGps(Location location) {
@@ -30,13 +44,14 @@ public class RestClient {
         try {
             json.put("lat", location.getLatitude());
             json.put("long", location.getLongitude());
+            json.put("accuracy", location.getAccuracy());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
         System.out.println(json.toString());
         byte[] jsonStr = json.toString().getBytes();
 
-        httpClient.post("/cars/carID/location.php", "application/json", jsonStr, new AsyncCallback() {
+        httpClient.post(gpsEndpoint, "application/json", jsonStr, new AsyncCallback() {
             @Override
             public void onComplete(HttpResponse httpResponse) {
                 System.out.println(httpResponse.getBodyAsString());
@@ -51,35 +66,35 @@ public class RestClient {
     }
 
     public static List<CarInfo> getCarsList() throws JSONException, HttpException {
-//        JSONArray cars = getCarsJson();
-//        List<CarInfo> list = new ArrayList<CarInfo>();
-//
-//        for (int i = 0; i < cars.length(); i++) {
-//            list.add(new CarInfo(
-//                    cars.getJSONObject(i).getString("_id"),
-//                    cars.getJSONObject(i).getString("description")));
-//        }
-//        return list;
+//        return getMockCarsList();
 
-        return getMockCarsList();
-    }
-
-    public static List<CarInfo> getMockCarsList() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            // rofl
-        }
+        JSONArray cars = getCarsJson();
         List<CarInfo> list = new ArrayList<CarInfo>();
-        list.add(new CarInfo("123", "The van"));
-        list.add(new CarInfo("456", "Charles's car"));
-        list.add(new CarInfo("789", "Kyle's car"));
 
+        for (int i = 0; i < cars.length(); i++) {
+            list.add(new CarInfo(
+                    cars.getJSONObject(i).getString("_id"),
+                    cars.getJSONObject(i).getString("description")));
+        }
         return list;
     }
 
+//    public static List<CarInfo> getMockCarsList() {
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            // rofl
+//        }
+//        List<CarInfo> list = new ArrayList<CarInfo>();
+//        list.add(new CarInfo("123", "The van"));
+//        list.add(new CarInfo("456", "Charles's car"));
+//        list.add(new CarInfo("789", "Kyle's car"));
+//
+//        return list;
+//    }
+
     private static JSONArray getCarsJson() throws JSONException, HttpException {
-        HttpResponse response = httpClient.get("/cars/json", null);
+        HttpResponse response = httpClient.get(carListEndpoint, null);
         if (response == null) {
             throw new HttpException();
         }

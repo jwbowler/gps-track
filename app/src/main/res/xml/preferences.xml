@@ -10,6 +10,30 @@
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
+    <EditTextPreference
+        android:key="pref_car_list_endpoint"
+        android:title="@string/pref_car_list_endpoint"
+        android:dialogTitle="@string/pref_car_list_endpoint"
+        android:defaultValue="@string/car_list_endpoint_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
+    <EditTextPreference
+        android:key="pref_gps_endpoint"
+        android:title="@string/pref_gps_endpoint"
+        android:dialogTitle="@string/pref_gps_endpoint"
+        android:defaultValue=""
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
+    <EditTextPreference
+        android:key="pref_webview_endpoint"
+        android:title="@string/pref_webview_endpoint"
+        android:dialogTitle="@string/pref_webview_endpoint"
+        android:defaultValue="@string/webview_endpoint_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
     <edu.mit.zbt.rushgps.app.RestoreDefaultsDialogPreference
         android:key="pref_reset"
         android:title="Restore defaults"

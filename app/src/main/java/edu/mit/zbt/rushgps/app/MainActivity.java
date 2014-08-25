@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
@@ -19,6 +22,13 @@ import java.lang.reflect.Field;
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
+    public static final int REQUEST_CODE_CAR_SELECTION_NECESSARY = 0;
+    public static final int REQUEST_CODE_CAR_SELECTION_OPTIONAL = 1;
+
+    public static final int RESULT_CODE_CAR_SELECTED = 1;
+    public static final int RESULT_CODE_CAR_NOT_SELECTED = -1;
+    public static final int RESULT_CODE_USER_PROBABLY_HIT_BACK_BUTTON = 0;
+
     private WebView mWebView;
 
     @Override
@@ -29,8 +39,6 @@ public class MainActivity extends Activity {
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new WebViewClient());
-
-        mWebView.loadUrl("http://www.google.com");
 
         // Old devices have a dedicated "menu" button that users always forget exists. For menu
         // items that don't get icons in the top bar, new devices will put a menu-looking button on
@@ -50,6 +58,18 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable("currentCar", CarInfo.getCurrentCar());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        CarInfo.setCurrentCar((CarInfo) savedInstanceState.getParcelable("currentCar"));
+    }
+
     protected void onStart() {
         super.onStart();
 
@@ -59,6 +79,15 @@ public class MainActivity extends Activity {
         }
 
         startGpsService();
+
+        if (!isGpsEndpointSet()) {
+            startCarListActivity();
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String baseUrl = prefs.getString("pref_base", "");
+        String endpoint = prefs.getString("pref_webview_endpoint", "");
+        mWebView.loadUrl(baseUrl + endpoint);
     }
 
     @Override
@@ -67,11 +96,36 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "requestCode = " + Integer.valueOf(requestCode).toString());
+        Log.d(TAG, "resultCode = " + Integer.valueOf(resultCode).toString());
+
+        if (requestCode == REQUEST_CODE_CAR_SELECTION_NECESSARY) {
+            if (resultCode != RESULT_CODE_CAR_SELECTED) {
+                stopGpsService();
+                finish();
+            }
+        }
+    }
+
+    private void startCarListActivity() {
+        boolean carSelectionNecessary = !isGpsEndpointSet();
+
+        int requestCode = carSelectionNecessary ? REQUEST_CODE_CAR_SELECTION_NECESSARY
+                                                : REQUEST_CODE_CAR_SELECTION_OPTIONAL;
+
+        Intent intent = new Intent(this, CarListActivity.class);
+        intent.putExtra("carSelectionNecessary", carSelectionNecessary);
+
+        startActivityForResult(intent, requestCode);
+    }
+
     public void onChangeCarClick(MenuItem item) {
         //DialogFragment carListDialogFragment = new CarListDialogFragment();
         //carListDialogFragment.show(getFragmentManager(), null);
 
-        startActivity(new Intent(this, CarListActivity.class));
+        startCarListActivity();
     }
 
     public void onDevConsoleClick(MenuItem item) {
@@ -81,6 +135,11 @@ public class MainActivity extends Activity {
     public void onStopClick(MenuItem item) {
         stopGpsService();
         finish();
+    }
+
+    public boolean isGpsEndpointSet() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return !(prefs.getString("pref_gps_endpoint", "").equals(""));
     }
 
     private void startGpsService() {

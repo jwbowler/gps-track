@@ -9,9 +9,12 @@ import android.preference.PreferenceFragment;
 public class DevSettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "DevSettingsFragment";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        getPreferenceManager().getSharedPreferences().edit().clear().commit();
         addPreferencesFromResource(R.xml.preferences);
     }
 

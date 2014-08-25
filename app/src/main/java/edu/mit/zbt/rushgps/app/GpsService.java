@@ -28,8 +28,8 @@ public class GpsService extends Service
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
 
-    private LocationManager mLocationManager = null;
     private Location mLastLocation = null;
+    private LocationManager mLocationManager = null;
 
     private NotificationManager mNotificationManager = null;
 
@@ -48,15 +48,15 @@ public class GpsService extends Service
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand");
+        Log.d(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
         if (mAlreadyRunning) {
-            Log.i(TAG, "already running!");
+            Log.d(TAG, "already running!");
             return START_STICKY;
         }
 
-        updateBaseUrl();
+        updateUrls();
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -77,7 +77,7 @@ public class GpsService extends Service
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
 
         if (mLocationManager != null) {
@@ -91,11 +91,13 @@ public class GpsService extends Service
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.e(TAG, "onLocationChanged: " + location);
+        Log.d(TAG, "onLocationChanged: " + location);
         mLastLocation = location;
 
         // Send the location update to the HTTP endpoint.
-        RestClient.postGps(location);
+        if (RestClient.isGpsEndpointSet()) {
+            RestClient.postGps(location);
+        }
 
         // Broadcast the location update to other classes in this app (e.g. DevDebugDataFragment).
         Intent broadcast = new Intent(LOCATION_INTENT_FILTER);
@@ -105,32 +107,46 @@ public class GpsService extends Service
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.e(TAG, "onProviderDisabled: " + provider);
+        Log.d(TAG, "onProviderDisabled: " + provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.e(TAG, "onProviderEnabled: " + provider);
+        Log.d(TAG, "onProviderEnabled: " + provider);
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.e(TAG, "onStatusChanged: " + provider);
+        Log.d(TAG, "onStatusChanged: " + provider);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("pref_base")) {
-            updateBaseUrl();
-        }
+        updateUrls();
+    }
+
+    private void updateUrls() {
+        updateBaseUrl();
+        updateCarListEndpoint();
+        updateGpsEndpoint();
     }
 
     private void updateBaseUrl() {
         String url = PreferenceManager.getDefaultSharedPreferences(this)
                                       .getString("pref_base", "");
-        Log.d(TAG, "url = " + url);
-        //RestClient.setBaseUrl(url);
-        RestClient.setBaseUrl("https://zbt-rush-test.meteor.com");
+        RestClient.setBaseUrl(url);
+    }
+
+    private void updateCarListEndpoint() {
+        String endpoint = PreferenceManager.getDefaultSharedPreferences(this)
+                                           .getString("pref_car_list_endpoint", "");
+        RestClient.setCarListEndpoint(endpoint);
+    }
+
+    private void updateGpsEndpoint() {
+        String endpoint = PreferenceManager.getDefaultSharedPreferences(this)
+                                           .getString("pref_gps_endpoint", "");
+        RestClient.setGpsEndpoint(endpoint);
     }
 
     private void createOngoingNotification() {

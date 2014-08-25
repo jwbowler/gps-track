@@ -2,14 +2,24 @@
 <resources>
 
     <string name="app_name">ZBT Rush GPS</string>
+
     <string name="title_activity_dev_console">Debug console</string>
     <string name="title_activity_car_list">Select car</string>
+
     <string name="action_change_car">Select car</string>
     <string name="action_dev_settings">Debug console</string>
     <string name="action_stop">Stop tracking and quit</string>
+
     <string name="pref_base_url">Base HTTP URL</string>
     <string name="base_url_default">https://zbt-rush-test.meteor.com</string>
+    <string name="pref_car_list_endpoint">Car list GET endpoint</string>
+    <string name="car_list_endpoint_default">/cars/json</string>
+    <string name="pref_gps_endpoint">GPS PUT endpoint</string>
+    <string name="pref_webview_endpoint">Main screen dashboard endpoint</string>
+    <string name="webview_endpoint_default">/</string>
+
     <string name="notification_content">Tracking location</string>
     <string name="prompt_gps">GPS is currently disabled. Hit OK to change your settings.</string>
+    <string name="alert_retry_get_carlist">Can\'t connect to the server that has the list of cars.</string>
 
 </resources>

@@ -23,14 +23,14 @@ public class DevDebugDataFragment extends Fragment implements ServiceConnection 
     private GpsService.GpsServiceBinder mGpsServiceBinder = null;
 
     private TextView mLatitudeView = null;
+    private TextView mLongitudeView = null;
+    private TextView mAccuracyView = null;
 
     private BroadcastReceiver mLocationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Location location = intent.getParcelableExtra("location");
-
-            String latitude = ((Double) location.getLatitude()).toString();
-            mLatitudeView.setText(latitude);
+            updateWithLocation(location);
         }
     };
 
@@ -49,7 +49,9 @@ public class DevDebugDataFragment extends Fragment implements ServiceConnection 
         super.onCreateView(inflater, container, savedInstanceState);
 
         View layout = inflater.inflate(R.layout.fragment_debug_data, container, false);
-        mLatitudeView = (TextView) layout.findViewById(R.id.view_latitude);
+        mLatitudeView = (TextView) layout.findViewById(R.id.debug_latitude);
+        mLongitudeView = (TextView) layout.findViewById(R.id.debug_longitude);
+        mAccuracyView = (TextView) layout.findViewById(R.id.debug_accuracy);
 
         mLocalBroadcastManager.registerReceiver(
                 mLocationReceiver, new IntentFilter(GpsService.LOCATION_INTENT_FILTER));
@@ -86,40 +88,35 @@ public class DevDebugDataFragment extends Fragment implements ServiceConnection 
         // lol
     }
 
-    public void updateDataViews() {
+    private void updateDataViews() {
         if (mGpsServiceBinder == null) {
-            mLatitudeView.setText("Waiting for location service");
+            writeToAllViews("Waiting for location service");
             return;
         }
 
         Location location = mGpsServiceBinder.getLocation();
         if (location == null) {
-            mLatitudeView.setText("Waiting for location");
+            writeToAllViews("Waiting for location");
             return;
         }
 
-        String latitude = ((Double) location.getLatitude()).toString();
-        mLatitudeView.setText(latitude);
+        updateWithLocation(location);
     }
 
-//    @Override
-//    public void onStart() {
-//        try {
-//            Context context = getActivity().getApplicationContext();
-//            context.bindService(new Intent(context, GpsService.class), this, 0);
-//        } catch (NullPointerException e) {
-//            Log.e(TAG, e.getMessage());
-//        }
-//
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        try {
-//            getActivity().getApplicationContext().unbindService(this);
-//        } catch (NullPointerException e) {
-//            Log.e(TAG, e.getMessage());
-//        }
-//    }
+    private void writeToAllViews(String string) {
+        mLatitudeView.setText(string);
+        mLongitudeView.setText(string);
+        mAccuracyView.setText(string);
+    }
+
+    private void updateWithLocation(Location location) {
+        String latitude = ((Double) location.getLatitude()).toString();
+        String longitude = ((Double) location.getLongitude()).toString();
+        String accuracy = ((Float) location.getAccuracy()).toString();
+
+        mLatitudeView.setText(latitude);
+        mLongitudeView.setText(longitude);
+        mAccuracyView.setText(accuracy);
+    }
 
 }

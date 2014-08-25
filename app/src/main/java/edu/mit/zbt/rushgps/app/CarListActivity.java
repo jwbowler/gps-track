@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 
 public class CarListActivity extends Activity {
+    private static String TAG = "CarListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,6 +15,11 @@ public class CarListActivity extends Activity {
         setContentView(R.layout.wrapper_car_list_fragment);
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
