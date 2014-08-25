@@ -65,7 +65,7 @@ public class CarListFragment extends ListFragment
             if (getActivity().getIntent().getExtras().getBoolean("carSelectionNecessary", false)) {
                 negativeMessage = "Quit";
             } else {
-                /String carDescription = CarInfo.getCurrentCar().getDescription();
+                String carDescription = CarInfo.getCurrentCar().getDescription();
                 negativeMessage = "Stick with \"" + carDescription + "\"";
             }
 
