@@ -42,13 +42,13 @@
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
-    <!--<EditTextPreference-->
-        <!--android:key="pref_driver_id"-->
-        <!--android:title="@string/pref_driver_id"-->
-        <!--android:dialogTitle="@string/pref_driver_id"-->
-        <!--android:defaultValue=""-->
-        <!--android:selectAllOnFocus="true"-->
-        <!--android:inputType="textUri" />-->
+    <EditTextPreference
+        android:key="pref_driver_id"
+        android:title="@string/pref_driver_id"
+        android:dialogTitle="@string/pref_driver_id"
+        android:defaultValue=""
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
 
     <EditTextPreference
         android:key="pref_driver_name"

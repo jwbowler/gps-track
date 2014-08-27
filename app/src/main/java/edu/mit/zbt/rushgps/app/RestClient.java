@@ -21,9 +21,14 @@ import java.util.List;
 
 public class RestClient {
     private static final String TAG = "RestClient";
-
     private static AndroidHttpClient httpClient = null;
     private static String baseUrl = null;
+
+    public static void initRestClient(Context context) {
+        if (httpClient == null || baseUrl == null) {
+            updateBaseUrl(context);
+        }
+    }
 
     private static String getActiveDriversListEndpoint(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
@@ -38,8 +43,9 @@ public class RestClient {
 
     public static void updateBaseUrl(Context context) {
         String newBaseUrl = PreferenceManager.getDefaultSharedPreferences(context)
-                            .getString("pref_base_url", "");
+                    .getString("pref_base_url", "");
         if ((httpClient == null) || !newBaseUrl.equals(baseUrl)) {
+            baseUrl = newBaseUrl;
             httpClient = new AndroidHttpClient(baseUrl);
         }
     }
@@ -47,9 +53,7 @@ public class RestClient {
     public static void postGps(Location location, final Context context) {
         JSONObject json = new JSONObject();
 
-        if (httpClient == null) {
-            updateBaseUrl(context);
-        }
+        initRestClient(context);
 
         try {
             json.put("latitude", location.getLatitude());
@@ -93,9 +97,7 @@ public class RestClient {
 
     private static JSONArray getActiveDriversJson(Context context) throws JSONException, HttpException {
         Log.d(TAG, "activeDriversListEndpoint = " + getActiveDriversListEndpoint(context));
-        if (httpClient == null) {
-            updateBaseUrl(context);
-        }
+        initRestClient(context);
         HttpResponse response = httpClient.get(getActiveDriversListEndpoint(context), null);
         if (response == null) {
             throw new HttpException();
