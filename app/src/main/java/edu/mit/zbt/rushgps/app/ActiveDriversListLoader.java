@@ -10,24 +10,26 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CarListLoader extends AsyncTaskLoader<List<CarInfo>> {
-    private static String TAG = "AppListLoader";
+public class ActiveDriversListLoader extends AsyncTaskLoader<List<ActiveDriver>> {
+    private static String TAG = "ActiveDriversListLoader";
 
-    public CarListLoader(Context context) {
+    public ActiveDriversListLoader(Context context) {
         super(context);
     }
 
     @Override
-    public List<CarInfo> loadInBackground() {
-        List<CarInfo> list;
+    public List<ActiveDriver> loadInBackground() {
+        List<ActiveDriver> list;
+
         try {
-            list = RestClient.getCarsList();
+            list = RestClient.getActiveDriversList();
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
-            list = new ArrayList<CarInfo>();
+            list = new ArrayList<ActiveDriver>();
         } catch (HttpException e) {
-            list = new ArrayList<CarInfo>();
+            list = new ArrayList<ActiveDriver>();
         }
+
         return list;
     }
 

@@ -16,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class DevDebugDataFragment extends Fragment implements ServiceConnection {
-    private static String TAG = "DevDebugDataFragment";
+public class DebugDataFragment extends Fragment implements ServiceConnection {
+    private static String TAG = "DebugDataFragment";
 
     private LocalBroadcastManager mLocalBroadcastManager = null;
     private GpsService.GpsServiceBinder mGpsServiceBinder = null;

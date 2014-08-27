@@ -3,42 +3,82 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:key="pref_base"
+        android:key="pref_base_url"
         android:title="@string/pref_base_url"
         android:dialogTitle="@string/pref_base_url"
-        android:defaultValue="@string/base_url_default"
+        android:defaultValue="@string/pref_base_url_default"
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
     <EditTextPreference
-        android:key="pref_car_list_endpoint"
-        android:title="@string/pref_car_list_endpoint"
-        android:dialogTitle="@string/pref_car_list_endpoint"
-        android:defaultValue="@string/car_list_endpoint_default"
+        android:key="pref_active_drivers_list_endpoint"
+        android:title="@string/pref_active_drivers_list_endpoint"
+        android:dialogTitle="@string/pref_active_drivers_list_endpoint"
+        android:defaultValue="@string/pref_active_drivers_list_endpoint_default"
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
     <EditTextPreference
-        android:key="pref_gps_endpoint"
-        android:title="@string/pref_gps_endpoint"
-        android:dialogTitle="@string/pref_gps_endpoint"
+        android:key="pref_gps_endpoint_pattern"
+        android:title="@string/pref_gps_endpoint_pattern"
+        android:dialogTitle="@string/pref_gps_endpoint_pattern"
+        android:defaultValue="@string/pref_gps_endpoint_pattern_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
+    <EditTextPreference
+        android:key="pref_webview_endpoint_pattern"
+        android:title="@string/pref_webview_endpoint_pattern"
+        android:dialogTitle="@string/pref_webview_endpoint_pattern"
+        android:defaultValue="@string/pref_webview_endpoint_pattern_default"
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
+    <EditTextPreference
+        android:key="pref_active_driver_id"
+        android:title="@string/pref_active_driver_id"
+        android:dialogTitle="@string/pref_active_driver_id"
+        android:defaultValue=""
+        android:selectAllOnFocus="true"
+        android:inputType="textUri" />
+
+    <!--<EditTextPreference-->
+        <!--android:key="pref_driver_id"-->
+        <!--android:title="@string/pref_driver_id"-->
+        <!--android:dialogTitle="@string/pref_driver_id"-->
+        <!--android:defaultValue=""-->
+        <!--android:selectAllOnFocus="true"-->
+        <!--android:inputType="textUri" />-->
+
+    <EditTextPreference
+        android:key="pref_driver_name"
+        android:title="@string/pref_driver_name"
+        android:dialogTitle="@string/pref_driver_name"
         android:defaultValue=""
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
     <EditTextPreference
-        android:key="pref_webview_endpoint"
-        android:title="@string/pref_webview_endpoint"
-        android:dialogTitle="@string/pref_webview_endpoint"
-        android:defaultValue="@string/webview_endpoint_default"
+        android:key="pref_car_name"
+        android:title="@string/pref_car_name"
+        android:dialogTitle="@string/pref_car_name"
+        android:defaultValue=""
         android:selectAllOnFocus="true"
         android:inputType="textUri" />
 
+    <!--<EditTextPreference-->
+        <!--android:key="pref_instruction"-->
+        <!--android:title="@string/pref_instruction"-->
+        <!--android:dialogTitle="@string/pref_instruction"-->
+        <!--android:defaultValue=""-->
+        <!--android:selectAllOnFocus="true"-->
+        <!--android:inputType="textUri" />-->
+
     <edu.mit.zbt.rushgps.app.RestoreDefaultsDialogPreference
         android:key="pref_reset"
-        android:title="Restore defaults"
-        android:dialogTitle="Restore defaults"
-        android:dialogMessage="Are you sure?"
+        android:title="@string/pref_reset"
+        android:dialogTitle="@string/pref_reset"
+        android:dialogMessage="@string/pref_reset_message"
         android:positiveButtonText="OK"
         android:negativeButtonText="Cancel" />
 

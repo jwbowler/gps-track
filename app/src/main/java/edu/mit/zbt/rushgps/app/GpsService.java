@@ -29,9 +29,9 @@ public class GpsService extends Service
     private static final float LOCATION_DISTANCE = 10f;
 
     private Location mLastLocation = null;
-    private LocationManager mLocationManager = null;
 
-    private NotificationManager mNotificationManager = null;
+    private LocationManager mLocationManager;
+    private NotificationManager mNotificationManager;
 
     private boolean mAlreadyRunning = false;
 
@@ -70,6 +70,9 @@ public class GpsService extends Service
 
         createOngoingNotification();
 
+        PreferenceManager.getDefaultSharedPreferences(this)
+                         .registerOnSharedPreferenceChangeListener(this);
+
         mAlreadyRunning = true;
 
         return START_STICKY;
@@ -79,6 +82,9 @@ public class GpsService extends Service
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                         .unregisterOnSharedPreferenceChangeListener(this);
 
         if (mLocationManager != null) {
             mLocationManager.removeUpdates(this);
@@ -95,11 +101,11 @@ public class GpsService extends Service
         mLastLocation = location;
 
         // Send the location update to the HTTP endpoint.
-        if (RestClient.isGpsEndpointSet()) {
-            RestClient.postGps(location);
+        if (ActiveDriver.isSetInPreferences(this)) {
+            RestClient.postGps(location, this);
         }
 
-        // Broadcast the location update to other classes in this app (e.g. DevDebugDataFragment).
+        // Broadcast the location update to other classes in this app (e.g. DebugDataFragment).
         Intent broadcast = new Intent(LOCATION_INTENT_FILTER);
         broadcast.putExtra("location", location);
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
@@ -127,25 +133,29 @@ public class GpsService extends Service
 
     private void updateUrls() {
         updateBaseUrl();
-        updateCarListEndpoint();
+        updateActiveDriversListEndpoint();
         updateGpsEndpoint();
     }
 
     private void updateBaseUrl() {
-        String url = PreferenceManager.getDefaultSharedPreferences(this)
-                                      .getString("pref_base", "");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String url = prefs.getString("pref_base_url", "");
         RestClient.setBaseUrl(url);
     }
 
-    private void updateCarListEndpoint() {
-        String endpoint = PreferenceManager.getDefaultSharedPreferences(this)
-                                           .getString("pref_car_list_endpoint", "");
-        RestClient.setCarListEndpoint(endpoint);
+    private void updateActiveDriversListEndpoint() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String endpoint = prefs.getString("pref_active_drivers_list_endpoint", "");
+        RestClient.setActiveDriversListEndpoint(endpoint);
     }
 
     private void updateGpsEndpoint() {
-        String endpoint = PreferenceManager.getDefaultSharedPreferences(this)
-                                           .getString("pref_gps_endpoint", "");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String endpointPattern = prefs.getString("pref_gps_endpoint_pattern", "");
+        String activeDriverId = prefs.getString("pref_active_driver_id", "");
+        String endpoint = String.format(endpointPattern, activeDriverId);
+
         RestClient.setGpsEndpoint(endpoint);
     }
 

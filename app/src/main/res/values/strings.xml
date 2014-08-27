@@ -1,25 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ZBT Rush GPS</string>
+    <string name="app_name">ZBT Rush</string>
 
-    <string name="title_activity_dev_console">Debug console</string>
-    <string name="title_activity_car_list">Select car</string>
+    <string name="title_activity_debug_console">Debug console</string>
+    <string name="title_activity_active_car_list">Choose your mission</string>
 
-    <string name="action_change_car">Select car</string>
+    <string name="action_change_car">Choose different driver/car</string>
     <string name="action_dev_settings">Debug console</string>
     <string name="action_stop">Stop tracking and quit</string>
 
     <string name="pref_base_url">Base HTTP URL</string>
-    <string name="base_url_default">https://zbt-rush-test.meteor.com</string>
-    <string name="pref_car_list_endpoint">Car list GET endpoint</string>
-    <string name="car_list_endpoint_default">/cars/json</string>
-    <string name="pref_gps_endpoint">GPS PUT endpoint</string>
-    <string name="pref_webview_endpoint">Main screen dashboard endpoint</string>
-    <string name="webview_endpoint_default">/</string>
+    <string name="pref_active_drivers_list_endpoint">GET endpoint for ActiveDriver list</string>
+    <string name="pref_gps_endpoint_pattern">Pattern of PUT endpoint for location data</string>
+    <string name="pref_webview_endpoint_pattern">Pattern of Driver UI endpoint</string>
+    <string name="pref_active_driver_id">ActiveDriver _id</string>
+    <!--<string name="pref_driver_id">driverId</string>-->
+    <string name="pref_driver_name">driverContent.name</string>
+    <string name="pref_car_name">carContent.name</string>
+    <!--<string name="pref_instruction">instruction</string>-->
+    <string name="pref_reset">Restore defaults</string>
+
+    <string name="pref_base_url_default">https://zbt-rush-test.meteor.com</string>
+    <string name="pref_active_drivers_list_endpoint_default">/drivers/json</string>
+    <string name="pref_gps_endpoint_pattern_default">/drivers/%s/location</string>
+    <string name="pref_webview_endpoint_pattern_default">/drivers/%s</string>
+    <string name="pref_reset_message">Are you sure?</string>
 
     <string name="notification_content">Tracking location</string>
     <string name="prompt_gps">GPS is currently disabled. Hit OK to change your settings.</string>
-    <string name="alert_retry_get_carlist">Can\'t connect to the server that has the list of cars.</string>
+    <string name="alert_retry_get_active_drivers">Can\'t connect to the server that has the list of active drivers.</string>
 
 </resources>

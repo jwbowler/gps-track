@@ -4,17 +4,21 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.view.Window;
 
 
-public class CarListActivity extends Activity {
-    private static String TAG = "CarListActivity";
+public class ActiveDriversListActivity extends Activity {
+    private static String TAG = "ActiveDriversListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.wrapper_car_list_fragment);
 
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setProgressBarIndeterminateVisibility(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        setContentView(R.layout.activity_active_drivers_list);
     }
 
     @Override

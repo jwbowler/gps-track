@@ -2,9 +2,11 @@ package edu.mit.zbt.rushgps.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
+import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -22,11 +25,11 @@ import java.lang.reflect.Field;
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
-    public static final int REQUEST_CODE_CAR_SELECTION_NECESSARY = 0;
-    public static final int REQUEST_CODE_CAR_SELECTION_OPTIONAL = 1;
+    public static final int REQUEST_CODE_SELECTION_NECESSARY = 0;
+    public static final int REQUEST_CODE_SELECTION_OPTIONAL = 1;
 
-    public static final int RESULT_CODE_CAR_SELECTED = 1;
-    public static final int RESULT_CODE_CAR_NOT_SELECTED = -1;
+    public static final int RESULT_CODE_SELECTED = 1;
+    public static final int RESULT_CODE_NOT_SELECTED = -1;
     public static final int RESULT_CODE_USER_PROBABLY_HIT_BACK_BUTTON = 0;
 
     private WebView mWebView;
@@ -34,11 +37,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setProgressBarIndeterminateVisibility(true);
+
         setContentView(R.layout.activity_main);
 
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.setWebViewClient(new MainActivityWebViewClient(this));
 
         // Old devices have a dedicated "menu" button that users always forget exists. For menu
         // items that don't get icons in the top bar, new devices will put a menu-looking button on
@@ -54,20 +61,8 @@ public class MainActivity extends Activity {
                 menuKeyField.setBoolean(config, false);
             }
         } catch (Exception e) {
-            // #yolo
+            Log.e(TAG, e.getMessage());
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putParcelable("currentCar", CarInfo.getCurrentCar());
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        CarInfo.setCurrentCar((CarInfo) savedInstanceState.getParcelable("currentCar"));
     }
 
     protected void onStart() {
@@ -80,14 +75,18 @@ public class MainActivity extends Activity {
 
         startGpsService();
 
-        if (!isGpsEndpointSet()) {
+        if (!ActiveDriver.isSetInPreferences(this)) {
             startCarListActivity();
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String baseUrl = prefs.getString("pref_base", "");
-        String endpoint = prefs.getString("pref_webview_endpoint", "");
-        mWebView.loadUrl(baseUrl + endpoint);
+        String baseUrl = prefs.getString("pref_base_url", "");
+        String endpointPattern = prefs.getString("pref_webview_endpoint_pattern", "");
+        String activeDriverId = prefs.getString("pref_active_driver_id", "");
+
+        String driverIdUrl = baseUrl + String.format(endpointPattern, activeDriverId);
+        Log.d(TAG, "driverIdUrl = " + driverIdUrl);
+        mWebView.loadUrl(driverIdUrl);
     }
 
     @Override
@@ -101,45 +100,41 @@ public class MainActivity extends Activity {
         Log.d(TAG, "requestCode = " + Integer.valueOf(requestCode).toString());
         Log.d(TAG, "resultCode = " + Integer.valueOf(resultCode).toString());
 
-        if (requestCode == REQUEST_CODE_CAR_SELECTION_NECESSARY) {
-            if (resultCode != RESULT_CODE_CAR_SELECTED) {
-                stopGpsService();
-                finish();
+        if (requestCode == REQUEST_CODE_SELECTION_NECESSARY) {
+            if (resultCode != RESULT_CODE_SELECTED) {
+                quitApp();
             }
         }
     }
 
     private void startCarListActivity() {
-        boolean carSelectionNecessary = !isGpsEndpointSet();
+        boolean carSelectionNecessary = !ActiveDriver.isSetInPreferences(this);
 
-        int requestCode = carSelectionNecessary ? REQUEST_CODE_CAR_SELECTION_NECESSARY
-                                                : REQUEST_CODE_CAR_SELECTION_OPTIONAL;
+        int requestCode = carSelectionNecessary ? REQUEST_CODE_SELECTION_NECESSARY
+                                                : REQUEST_CODE_SELECTION_OPTIONAL;
 
-        Intent intent = new Intent(this, CarListActivity.class);
+        Intent intent = new Intent(this, ActiveDriversListActivity.class);
         intent.putExtra("carSelectionNecessary", carSelectionNecessary);
 
         startActivityForResult(intent, requestCode);
     }
 
     public void onChangeCarClick(MenuItem item) {
-        //DialogFragment carListDialogFragment = new CarListDialogFragment();
-        //carListDialogFragment.show(getFragmentManager(), null);
-
         startCarListActivity();
     }
 
     public void onDevConsoleClick(MenuItem item) {
-        startActivity(new Intent(this, DevConsoleActivity.class));
+        startActivity(new Intent(this, DebugConsoleActivity.class));
     }
 
     public void onStopClick(MenuItem item) {
-        stopGpsService();
-        finish();
+        quitApp();
     }
 
-    public boolean isGpsEndpointSet() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return !(prefs.getString("pref_gps_endpoint", "").equals(""));
+    private void quitApp() {
+        stopGpsService();
+        ActiveDriver.resetPreferences(this);
+        finish();
     }
 
     private void startGpsService() {
@@ -172,6 +167,32 @@ public class MainActivity extends Activity {
                         }
                 );
         builder.create().show();
+    }
+
+    private class MainActivityWebViewClient extends WebViewClient {
+        private Context mContext;
+
+        public MainActivityWebViewClient(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            setProgressBarIndeterminateVisibility(true);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            setProgressBarIndeterminateVisibility(false);
+        }
+
+//        @Override
+//        public void onReceivedError(WebView view, int errorCode, String description,
+//                                    String failingUrl) {
+//            String message = "Failed to load " + failingUrl
+//                             + " - " + description;
+//            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+//        }
     }
 }
 

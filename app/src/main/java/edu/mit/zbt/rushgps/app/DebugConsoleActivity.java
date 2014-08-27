@@ -7,7 +7,7 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 
-public class DevConsoleActivity extends Activity {
+public class DebugConsoleActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,22 +25,22 @@ public class DevConsoleActivity extends Activity {
 
         ActionBar.Tab tab1 = actionBar
             .newTab()
-            .setText("Debug data")
-            .setTag("DevDebugDataFragment")
+            .setText("Location data")
+            .setTag("DebugDataFragment")
             .setTabListener(
-                new FragmentTabListener<DevDebugDataFragment>(this, "first",
-                                DevDebugDataFragment.class));
+                new FragmentTabListener<DebugDataFragment>(this, "first",
+                                DebugDataFragment.class));
 
         actionBar.addTab(tab1);
         actionBar.selectTab(tab1);
 
         ActionBar.Tab tab2 = actionBar
             .newTab()
-            .setText("Settings")
-            .setTag("DevSettingsFragment")
+            .setText("App state")
+            .setTag("DebugSettingsFragment")
             .setTabListener(
-                new FragmentTabListener<DevSettingsFragment>(this, "second",
-                                DevSettingsFragment.class));
+                new FragmentTabListener<DebugSettingsFragment>(this, "second",
+                                DebugSettingsFragment.class));
 
         actionBar.addTab(tab2);
     }
