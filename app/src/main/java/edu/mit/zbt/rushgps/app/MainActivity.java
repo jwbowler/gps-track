@@ -14,8 +14,10 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -47,6 +49,9 @@ public class MainActivity extends Activity {
 
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
+//        mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         mWebView.setWebViewClient(new MainActivityWebViewClient(this));
 
         // Old devices have a dedicated "menu" button that users always forget exists. For menu
