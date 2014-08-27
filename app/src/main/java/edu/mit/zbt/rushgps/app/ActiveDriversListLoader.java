@@ -22,7 +22,7 @@ public class ActiveDriversListLoader extends AsyncTaskLoader<List<ActiveDriver>>
         List<ActiveDriver> list;
 
         try {
-            list = RestClient.getActiveDriversList();
+            list = RestClient.getActiveDriversList(getContext());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
             list = new ArrayList<ActiveDriver>();

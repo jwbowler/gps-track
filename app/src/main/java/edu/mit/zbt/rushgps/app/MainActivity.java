@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String baseUrl = prefs.getString("pref_base_url", "");
         String endpointPattern = prefs.getString("pref_webview_endpoint_pattern", "");
-        String activeDriverId = prefs.getString("pref_active_driver_id", "");
+        String activeDriverId = prefs.getString("pref_driver_id", "");
 
         String driverIdUrl = baseUrl + String.format(endpointPattern, activeDriverId);
         Log.d(TAG, "driverIdUrl = " + driverIdUrl);

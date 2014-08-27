@@ -15,10 +15,10 @@
     <string name="pref_gps_endpoint_pattern">Pattern of PUT endpoint for location data</string>
     <string name="pref_webview_endpoint_pattern">Pattern of Driver UI endpoint</string>
     <string name="pref_active_driver_id">ActiveDriver _id</string>
-    <!--<string name="pref_driver_id">driverId</string>-->
+    <string name="pref_driver_id">driverId</string>
     <string name="pref_driver_name">driverContent.name</string>
     <string name="pref_car_name">carContent.name</string>
-    <!--<string name="pref_instruction">instruction</string>-->
+
     <string name="pref_reset">Restore defaults</string>
 
     <string name="pref_base_url_default">https://zbt-rush-test.meteor.com</string>

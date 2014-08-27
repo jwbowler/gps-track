@@ -56,8 +56,6 @@ public class GpsService extends Service
             return START_STICKY;
         }
 
-        updateUrls();
-
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -128,35 +126,7 @@ public class GpsService extends Service
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        updateUrls();
-    }
-
-    private void updateUrls() {
-        updateBaseUrl();
-        updateActiveDriversListEndpoint();
-        updateGpsEndpoint();
-    }
-
-    private void updateBaseUrl() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String url = prefs.getString("pref_base_url", "");
-        RestClient.setBaseUrl(url);
-    }
-
-    private void updateActiveDriversListEndpoint() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String endpoint = prefs.getString("pref_active_drivers_list_endpoint", "");
-        RestClient.setActiveDriversListEndpoint(endpoint);
-    }
-
-    private void updateGpsEndpoint() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        String endpointPattern = prefs.getString("pref_gps_endpoint_pattern", "");
-        String activeDriverId = prefs.getString("pref_active_driver_id", "");
-        String endpoint = String.format(endpointPattern, activeDriverId);
-
-        RestClient.setGpsEndpoint(endpoint);
+        RestClient.updateBaseUrl(this);
     }
 
     private void createOngoingNotification() {

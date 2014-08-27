@@ -1,7 +1,9 @@
 package edu.mit.zbt.rushgps.app;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,23 +23,33 @@ public class RestClient {
     private static final String TAG = "RestClient";
 
     private static AndroidHttpClient httpClient = null;
-    private static String activeDriversListEndpoint = null;
-    private static String gpsEndpoint = null;
+    private static String baseUrl = null;
 
-    public static void setBaseUrl(String baseUrl) {
-        httpClient = new AndroidHttpClient(baseUrl);
+    private static String getActiveDriversListEndpoint(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString("pref_active_drivers_list_endpoint", "");
     }
 
-    public static void setActiveDriversListEndpoint(String newCarListEndpoint) {
-        activeDriversListEndpoint = newCarListEndpoint;
+    private static String getGpsEndpoint(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return String.format(prefs.getString("pref_gps_endpoint_pattern", ""),
+                prefs.getString("pref_active_driver_id", ""));
     }
 
-    public static void setGpsEndpoint(String newGpsEndpoint) {
-        gpsEndpoint = newGpsEndpoint;
+    public static void updateBaseUrl(Context context) {
+        String newBaseUrl = PreferenceManager.getDefaultSharedPreferences(context)
+                            .getString("pref_base_url", "");
+        if ((httpClient == null) || !newBaseUrl.equals(baseUrl)) {
+            httpClient = new AndroidHttpClient(baseUrl);
+        }
     }
 
     public static void postGps(Location location, final Context context) {
         JSONObject json = new JSONObject();
+
+        if (httpClient == null) {
+            updateBaseUrl(context);
+        }
 
         try {
             json.put("latitude", location.getLatitude());
@@ -49,7 +61,7 @@ public class RestClient {
 
         byte[] jsonStr = json.toString().getBytes();
 
-        httpClient.post(gpsEndpoint, "application/json", jsonStr, new AsyncCallback() {
+        httpClient.post(getGpsEndpoint(context), "application/json", jsonStr, new AsyncCallback() {
             @Override
             public void onComplete(HttpResponse httpResponse) {
                 Log.d(TAG, httpResponse.getBodyAsString());
@@ -64,8 +76,8 @@ public class RestClient {
         });
     }
 
-    public static List<ActiveDriver> getActiveDriversList() throws JSONException, HttpException {
-        JSONArray activeDrivers = getActiveDriversJson();
+    public static List<ActiveDriver> getActiveDriversList(Context context) throws JSONException, HttpException {
+        JSONArray activeDrivers = getActiveDriversJson(context);
         List<ActiveDriver> list = new ArrayList<ActiveDriver>();
 
         for (int i = 0; i < activeDrivers.length(); i++) {
@@ -73,15 +85,18 @@ public class RestClient {
                     activeDrivers.getJSONObject(i).getString("_id"),
                     activeDrivers.getJSONObject(i).getString("driverId"),
                     activeDrivers.getJSONObject(i).getJSONObject("driverContent").getString("name"),
-                    activeDrivers.getJSONObject(i).getJSONObject("carContent").getString("name"),
-                    activeDrivers.getJSONObject(i).getString("instruction")));
+                    activeDrivers.getJSONObject(i).getJSONObject("carContent").getString("name")
+             ));
         }
         return list;
     }
 
-    private static JSONArray getActiveDriversJson() throws JSONException, HttpException {
-        Log.d(TAG, "activeDriversListEndpoint = " + activeDriversListEndpoint);
-        HttpResponse response = httpClient.get(activeDriversListEndpoint, null);
+    private static JSONArray getActiveDriversJson(Context context) throws JSONException, HttpException {
+        Log.d(TAG, "activeDriversListEndpoint = " + getActiveDriversListEndpoint(context));
+        if (httpClient == null) {
+            updateBaseUrl(context);
+        }
+        HttpResponse response = httpClient.get(getActiveDriversListEndpoint(context), null);
         if (response == null) {
             throw new HttpException();
         }
