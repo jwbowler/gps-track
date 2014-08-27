@@ -14,7 +14,7 @@ public class DebugSettingsFragment extends PreferenceFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        addPreferencesFromResource(R.xml.preferences);
+        addPreferencesFromResource(R.xml.preferences);
     }
 
     @Override
