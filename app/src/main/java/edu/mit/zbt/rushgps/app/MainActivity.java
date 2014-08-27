@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
         startGpsService();
 
         if (!ActiveDriver.isSetInPreferences(this)) {
-            startCarListActivity();
+            startActiveDriversListActivity();
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -109,20 +109,20 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void startCarListActivity() {
-        boolean carSelectionNecessary = !ActiveDriver.isSetInPreferences(this);
+    private void startActiveDriversListActivity() {
+        boolean selectionNecessary = !ActiveDriver.isSetInPreferences(this);
 
-        int requestCode = carSelectionNecessary ? REQUEST_CODE_SELECTION_NECESSARY
-                                                : REQUEST_CODE_SELECTION_OPTIONAL;
+        int requestCode = selectionNecessary ? REQUEST_CODE_SELECTION_NECESSARY
+                                             : REQUEST_CODE_SELECTION_OPTIONAL;
 
         Intent intent = new Intent(this, ActiveDriversListActivity.class);
-        intent.putExtra("carSelectionNecessary", carSelectionNecessary);
+        intent.putExtra("selectionNecessary", selectionNecessary);
 
         startActivityForResult(intent, requestCode);
     }
 
     public void onChangeCarClick(MenuItem item) {
-        startCarListActivity();
+        startActiveDriversListActivity();
     }
 
     public void onDevConsoleClick(MenuItem item) {

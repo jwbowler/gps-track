@@ -53,7 +53,7 @@ public class ActiveDriversListFragment extends ListFragment
             final int loaderId = loader.getId();
 
             final String negativeMessage;
-            if (getActivity().getIntent().getExtras().getBoolean("carSelectionNecessary", false)) {
+            if (getActivity().getIntent().getExtras().getBoolean("selectionNecessary", false)) {
                 negativeMessage = "Quit";
             } else {
                 negativeMessage = "Keep current";
