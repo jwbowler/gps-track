@@ -75,16 +75,16 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
+        if (!ActiveDriver.isSetInPreferences(this)) {
+            startActiveDriversListActivity();
+        }
+
         LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             displayPromptForEnablingGPS();
         }
 
         startGpsService();
-
-        if (!ActiveDriver.isSetInPreferences(this)) {
-            startActiveDriversListActivity();
-        }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String baseUrl = prefs.getString("pref_base_url", "");
@@ -161,6 +161,7 @@ public class MainActivity extends Activity {
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface d, int id) {
+                                stopGpsService();
                                 startActivity(new Intent(action));
                                 d.dismiss();
                             }
