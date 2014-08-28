@@ -93,7 +93,10 @@ public class MainActivity extends Activity {
 
         String driverIdUrl = baseUrl + String.format(endpointPattern, activeDriverId);
         Log.d(TAG, "driverIdUrl = " + driverIdUrl);
-        mWebView.loadUrl(driverIdUrl);
+
+        if (mWebView.getUrl() == null || !mWebView.getUrl().equals(driverIdUrl)) {
+            mWebView.loadUrl(driverIdUrl);
+        }
     }
 
     @Override
