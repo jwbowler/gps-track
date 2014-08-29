@@ -21,7 +21,7 @@
 
     <string name="pref_reset">Restore defaults</string>
 
-    <string name="pref_base_url_default">https://zbt-rush-test.meteor.com</string>
+    <string name="pref_base_url_default">http://zbtatmit-rushapp.meteor.com</string>
     <string name="pref_active_drivers_list_endpoint_default">/drivers/json</string>
     <string name="pref_gps_endpoint_pattern_default">/drivers/%s/location</string>
     <string name="pref_webview_endpoint_pattern_default">/drivers/%s</string>
