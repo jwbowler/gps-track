@@ -16,7 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RestClient {
@@ -55,9 +57,13 @@ public class RestClient {
 
         initRestClient(context);
 
+        String pingtime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .format(new Date(location.getTime()));
+
         try {
             json.put("latitude", location.getLatitude());
             json.put("longitude", location.getLongitude());
+            json.put("pingtime", pingtime);
             json.put("accuracy", location.getAccuracy());
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
